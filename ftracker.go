@@ -7,11 +7,11 @@ import (
 
 // Основные константы, необходимые для расчетов.
 const (
-	lenStep   = 0.65    // средняя длина шага.
-	mInKm     = 1000.00 // количество метров в километре.
-	minInH    = 60      // количество минут в часе.
-	kmhInMsec = 0.278   // коэффициент для преобразования км/ч в м/с.
-	cmInM     = 100     // количество сантиметров в метре.
+	lenStep   = 0.65  // средняя длина шага.
+	mInKm     = 1000  // количество метров в километре.
+	minInH    = 60    // количество минут в часе.
+	kmhInMsec = 0.278 // коэффициент для преобразования км/ч в м/с.
+	cmInM     = 100   // количество сантиметров в метре.
 )
 
 // distance возвращает дистанцию(в километрах), которую преодолел пользователь за время тренировки.
@@ -82,12 +82,8 @@ const (
 // duration float64 — длительность тренировки в часах.
 func RunningSpentCalories(action int, weight, duration float64) float64 {
 	// ваш код здесь
-	k1 := float64(runningCaloriesMeanSpeedMultiplier)
-	k2 := runningCaloriesMeanSpeedShift
-	Usr := meanSpeed(action, duration)
-	m := weight
-	t := duration
-	return (k1 * Usr * k2) * m / mInKm * t * minInH
+	avarageSpeed := meanSpeed(action, duration)
+	return (runningCaloriesMeanSpeedMultiplier * avarageSpeed * runningCaloriesMeanSpeedShift) * weight / mInKm * duration * minInH
 } //((18 * СредняяСкоростьВКм/ч * 1.79) * ВесСпортсменаВКг / mInKm
 //* ВремяТренировкиВЧасах * minInH)
 
@@ -107,13 +103,8 @@ const (
 // height float64 — рост пользователя.
 func WalkingSpentCalories(action int, duration, weight, height float64) float64 {
 	// ваш код здесь
-	k1 := walkingCaloriesWeightMultiplier
-	k2 := walkingSpeedHeightMultiplier
-	Usr := meanSpeed(action, duration) * kmhInMsec
-	h := height / cmInM
-	m := weight
-	t := duration
-	return (k1*m + (math.Pow(Usr, 2)/h)*k2*m) * t * minInH
+	avarageSpeed := meanSpeed(action, duration) * kmhInMsec
+	return (walkingCaloriesWeightMultiplier*weight + (math.Pow(avarageSpeed, 2)*math.Pow(height/cmInM, -1))*walkingSpeedHeightMultiplier*weight) * duration * minInH
 } //((0.035 * ВесСпортсменаВКг + (СредняяСкоростьВМетрахВСекунду**2 / РостВМетрах)
 //* 0.029 * ВесСпортсменаВКг) * ВремяТренировкиВЧасах * minInH)
 
@@ -147,10 +138,6 @@ func swimmingMeanSpeed(lengthPool, countPool int, duration float64) float64 {
 // weight float64 — вес пользователя.
 func SwimmingSpentCalories(lengthPool, countPool int, duration, weight float64) float64 {
 	// ваш код здесь
-	k1 := swimmingCaloriesMeanSpeedShift
-	k2 := float64(swimmingCaloriesWeightMultiplier)
-	Usr := swimmingMeanSpeed(lengthPool, countPool, duration)
-	m := weight
-	t := duration
-	return (Usr + k1) * k2 * m * t
+	avarageSpeed := swimmingMeanSpeed(lengthPool, countPool, duration)
+	return (avarageSpeed + swimmingCaloriesMeanSpeedShift) * swimmingCaloriesWeightMultiplier * weight * duration
 } //(СредняяСкоростьВКм/ч + 1.1) * 2 * ВесСпортсменаВКг * ВремяТренеровкиВЧасах
